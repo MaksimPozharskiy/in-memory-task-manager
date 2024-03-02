@@ -4,11 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/requestscounter"
 )
-
-var _ requestscounter.RequestsCounterInterface = &mockRequestsCounter{}
 
 type mockRequestsCounter struct {
 	counts map[int]int

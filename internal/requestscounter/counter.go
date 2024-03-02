@@ -4,11 +4,6 @@ import (
 	"sync"
 )
 
-type RequestsCounterInterface interface {
-	Increment(id int)
-	Get(id int) int
-}
-
 // struct for storing requests count
 type RequestsCounter struct {
 	mu     sync.RWMutex

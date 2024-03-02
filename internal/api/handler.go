@@ -5,14 +5,15 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/requestscounter"
 )
 
-var _ requestscounter.RequestsCounterInterface = &requestscounter.RequestsCounter{}
+type RequestsCounter interface {
+	Increment(id int)
+	Get(id int) int
+}
 
 type API struct {
-	Counter                 requestscounter.RequestsCounterInterface
+	Counter                 RequestsCounter
 	IncrementActiveRequests func()
 	DecrementActiveRequests func()
 }
