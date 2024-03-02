@@ -27,7 +27,7 @@ func main() {
 		}
 	}()
 
-	shutdown.GracefulShutdown(server)
+	shutdown.GracefulShutdown(server, requestsCounter)
 }
 
 func setupRouter(counter *requestscounter.RequestsCounter) http.Handler {
