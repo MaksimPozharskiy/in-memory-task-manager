@@ -6,13 +6,16 @@ import (
 	"time"
 
 	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/api"
+	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/requestscounter"
 	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/shutdown"
 )
 
 func main() {
+	requestsCounter := requestscounter.NewRequestsCounter()
+
 	server := &http.Server{
 		Addr:         ":8081",
-		Handler:      setupRouter(),
+		Handler:      setupRouter(requestsCounter),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
@@ -27,10 +30,11 @@ func main() {
 	shutdown.GracefulShutdown(server)
 }
 
-func setupRouter() http.Handler {
+func setupRouter(counter *requestscounter.RequestsCounter) http.Handler {
 	mux := http.NewServeMux()
+	apiInstance := &api.API{Counter: counter}
 
-	mux.HandleFunc("/api/task/", api.TaskHandler)
+	mux.HandleFunc("/api/task/", apiInstance.TaskHandler)
 
 	return mux
 }
