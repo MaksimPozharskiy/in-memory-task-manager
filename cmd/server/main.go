@@ -1,38 +1,27 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"time"
 
 	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/api"
 	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/requestscounter"
-	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/shutdown"
+	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/server"
 )
 
 func main() {
 	requestsCounter := requestscounter.NewRequestsCounter()
 
-	server := &http.Server{
-		Addr:         ":8081",
-		Handler:      setupRouter(requestsCounter),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
+	server := server.NewServer(":8081", nil, requestsCounter)
+	handler := setupRouter(requestsCounter, server)
+	server.SetHandler(handler)
 
-	go func() {
-		log.Printf("Starting server on %s\n", server.Addr)
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalf("Error starting server: %s\n", err)
-		}
-	}()
-
-	shutdown.GracefulShutdown(server, requestsCounter)
+	server.Start()
 }
 
-func setupRouter(counter *requestscounter.RequestsCounter) http.Handler {
+func setupRouter(counter *requestscounter.RequestsCounter, server *server.Server) http.Handler {
 	mux := http.NewServeMux()
-	apiInstance := &api.API{Counter: counter}
+	apiInstance := &api.API{Counter: counter, IncrementActiveRequests: server.IncrementActiveRequests,
+		DecrementActiveRequests: server.DecrementActiveRequests}
 
 	mux.HandleFunc("/api/task/", apiInstance.TaskHandler)
 

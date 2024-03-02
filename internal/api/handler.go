@@ -10,10 +10,16 @@ import (
 )
 
 type API struct {
-	Counter *requestscounter.RequestsCounter
+	Counter                 *requestscounter.RequestsCounter
+	IncrementActiveRequests func()
+	DecrementActiveRequests func()
 }
 
 func (api *API) TaskHandler(w http.ResponseWriter, r *http.Request) {
+	// compute active requests for graceful shutdown
+	api.IncrementActiveRequests()
+	defer api.DecrementActiveRequests()
+
 	// get id from parameters
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/task/")
 	id, err := strconv.Atoi(idStr)
