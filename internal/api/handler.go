@@ -9,8 +9,10 @@ import (
 	"github.com/MaksimPozharskiy/in-memory-task-manager/internal/requestscounter"
 )
 
+var _ requestscounter.RequestsCounterInterface = &requestscounter.RequestsCounter{}
+
 type API struct {
-	Counter                 *requestscounter.RequestsCounter
+	Counter                 requestscounter.RequestsCounterInterface
 	IncrementActiveRequests func()
 	DecrementActiveRequests func()
 }
