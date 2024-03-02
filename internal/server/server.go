@@ -52,6 +52,7 @@ func (s *Server) GracefulShutdown() {
 	// check active connections
 	for s.IsActiveRequests() {
 		log.Println("Waiting for active requests to complete...")
+		// @TODO improve with  addition chan??
 		time.Sleep(1 * time.Second)
 	}
 
